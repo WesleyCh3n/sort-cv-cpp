@@ -27,7 +27,8 @@ target_include_directories(sort PUBLIC
 target_include_directories(sort PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-set_target_properties(sort PROPERTIES PUBLIC_HEADER "src/track.hpp")
+set_target_properties(sort PROPERTIES PUBLIC_HEADER "src/sort.hpp")
+add_library(track::sort ALIAS sort)
 
 include(CMakePackageConfigHelpers)
 list(APPEND INSTALL_TARGETS
@@ -56,5 +57,5 @@ if(BUILD_EXAMPLES)
   add_executable(main
     ${CMAKE_CURRENT_SOURCE_DIR}/example/main.cpp
   )
-  target_link_libraries(main PRIVATE sort)
+  target_link_libraries(main PRIVATE track::sort)
 endif()

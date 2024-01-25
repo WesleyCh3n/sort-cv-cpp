@@ -15,23 +15,23 @@ find_package(OpenCV REQUIRED)
 # Build Libraries
 #==============================================================================
 include(GNUInstallDirs)
-add_library(track
+add_library(sort
   src/hungarian.cpp
 )
-target_link_libraries(track PUBLIC
+target_link_libraries(sort PUBLIC
   ${OpenCV_LIBS}
 )
-target_include_directories(track PUBLIC
+target_include_directories(sort PUBLIC
   ${OpenCV_INCLUDE_DIRS}
 )
-target_include_directories(track PUBLIC
+target_include_directories(sort PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-set_target_properties(track PROPERTIES PUBLIC_HEADER "src/track.hpp")
+set_target_properties(sort PROPERTIES PUBLIC_HEADER "src/track.hpp")
 
 include(CMakePackageConfigHelpers)
 list(APPEND INSTALL_TARGETS
-  track
+ sort
 )
 set(CONFIG_EXPORT_NAME track-config)
 set(CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/track)
@@ -56,5 +56,5 @@ if(BUILD_EXAMPLES)
   add_executable(main
     ${CMAKE_CURRENT_SOURCE_DIR}/example/main.cpp
   )
-  target_link_libraries(main PRIVATE track)
+  target_link_libraries(main PRIVATE sort)
 endif()

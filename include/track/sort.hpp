@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "hungarian.hpp"
-#include "kalman_tracker.hpp"
+#include "kalman.hpp"
 
 namespace track {
 template <class T> struct TrackingBox {

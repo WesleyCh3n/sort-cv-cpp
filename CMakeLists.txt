@@ -16,6 +16,7 @@ find_package(OpenCV REQUIRED)
 #==============================================================================
 include(GNUInstallDirs)
 add_library(sort
+  src/sort.cpp
   src/hungarian.cpp
 )
 target_link_libraries(sort PUBLIC
@@ -25,9 +26,15 @@ target_include_directories(sort PUBLIC
   ${OpenCV_INCLUDE_DIRS}
 )
 target_include_directories(sort PUBLIC
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/track>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-set_target_properties(sort PROPERTIES PUBLIC_HEADER "src/sort.hpp")
+set(SORT_PUBLIC_HEADERS
+    "include/track/sort.hpp"
+    "include/track/hungarian.hpp"
+    "include/track/kalman.hpp"
+)
+set_target_properties(sort PROPERTIES
+  PUBLIC_HEADER "${SORT_PUBLIC_HEADERS}")
 add_library(track::sort ALIAS sort)
 
 include(CMakePackageConfigHelpers)

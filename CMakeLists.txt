@@ -26,7 +26,7 @@ target_include_directories(sort PUBLIC
   ${OpenCV_INCLUDE_DIRS}
 )
 target_include_directories(sort PUBLIC
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/track>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 set(SORT_PUBLIC_HEADERS
     "include/track/sort.hpp"

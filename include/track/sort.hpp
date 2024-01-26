@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <opencv2/core/types.hpp>
 #include <set>
 #include <vector>
@@ -48,11 +49,22 @@ template <class T> class SORT {
   int frame_count_ = 0;
   uint64_t track_id = 0;
 
+  std::vector<uint64_t> removed_ids_;
+
 public:
   SORT(int max_age, int min_hits, double iou_threshold)
       : max_age_(max_age), min_hits_(min_hits), iou_threshold_(iou_threshold) {}
 
-  std::vector<TrackingBox<T>> predict(std::vector<cv::Rect_<T>> &detections) {
+  std::vector<TrackingBox<T>>
+  predict_with_removed(const std::vector<cv::Rect_<T>> &detections,
+                       std::vector<uint64_t> &removed_ids) {
+    auto results = predict(detections);
+    removed_ids = std::move(removed_ids_); // move out the removed ids
+    return results;
+  }
+
+  std::vector<TrackingBox<T>>
+  predict(const std::vector<cv::Rect_<T>> &detections) {
     // prevent overflow
     if (track_id == UINT64_MAX - 1) {
       track_id = 0;
@@ -178,6 +190,7 @@ public:
 
     // get trackers' output
     frameTrackingResult.clear();
+    removed_ids_.clear();
     for (auto it = kfs_.begin(); it != kfs_.end();) {
       if (((*it).m_time_since_update < 1) &&
           ((*it).m_hit_streak >= min_hits_ || frame_count_ <= min_hits_)) {
@@ -190,8 +203,10 @@ public:
         it++;
 
       // remove dead tracklet
-      if (it != kfs_.end() && (*it).m_time_since_update > max_age_)
+      if (it != kfs_.end() && (*it).m_time_since_update > max_age_) {
+        removed_ids_.push_back((*it).m_id);
         it = kfs_.erase(it);
+      }
     }
     return frameTrackingResult;
   }

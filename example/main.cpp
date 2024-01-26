@@ -13,8 +13,8 @@ void TestSORT(string seqName, bool display);
 
 int main() {
   vector<string> sequences = {
-      // "ADL-Rundle-6", //
-      "ADL-Rundle-8", //
+      "ADL-Rundle-6", //
+                      // "ADL-Rundle-8", //
                       // "ETH-Bahnhof",    //
                       // "ETH-Pedcross2",  //
                       // "ETH-Sunnyday",   //
@@ -74,9 +74,16 @@ void TestSORT(string seqName, bool display) {
   }
 
   // 3. run SORT tracking on each frame
-  track::SORT<float> sort_algo(1, 3, 0.3);
+  track::SORT<float> sort_algo(1, 1, 0.3);
+  std::vector<uint64_t> removed_ids;
   for (int fi = 0; fi < det_frames.size(); fi++) {
-    auto res = sort_algo.predict(det_frames[fi]);
+    std::cout << "Frame: " << fi << std::endl;
+    auto res = sort_algo.predict_with_removed(det_frames[fi], removed_ids);
+    std::cout << "Removed ids: ";
+    for (const auto &id : removed_ids) {
+      std::cout << id << ' ';
+    }
+    std::cout << '\n';
     for (auto tb : res)
       std::cout << "x"
                 << "," << tb.id << "," << tb.box.x << "," << tb.box.y << ","

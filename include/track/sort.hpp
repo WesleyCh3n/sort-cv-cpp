@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <opencv2/core/types.hpp>
 #include <set>
 #include <vector>
@@ -72,6 +71,8 @@ public:
     // NOTE: you can comment if statement if you want real frame count
     if (frame_count_ <= min_hits_)
       frame_count_++;
+    // empty removed id
+    removed_ids_.clear();
 
     if (kfs_.size() == 0) { // the first frame met
       // initialize kalman trackers using first detections.
@@ -100,6 +101,7 @@ public:
         kf_predicts_.push_back(pBox);
         it++;
       } else {
+        removed_ids_.emplace_back((*it).m_id);
         it = kfs_.erase(it);
       }
     }
@@ -190,7 +192,6 @@ public:
 
     // get trackers' output
     frameTrackingResult.clear();
-    removed_ids_.clear();
     for (auto it = kfs_.begin(); it != kfs_.end();) {
       if (((*it).m_time_since_update < 1) &&
           ((*it).m_hit_streak >= min_hits_ || frame_count_ <= min_hits_)) {
@@ -204,7 +205,7 @@ public:
 
       // remove dead tracklet
       if (it != kfs_.end() && (*it).m_time_since_update > max_age_) {
-        removed_ids_.push_back((*it).m_id);
+        removed_ids_.emplace_back((*it).m_id);
         it = kfs_.erase(it);
       }
     }

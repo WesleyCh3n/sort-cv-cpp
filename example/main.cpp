@@ -1,7 +1,12 @@
+#include <assert.h>
 #include <fstream>
 #include <iostream>
 
 #include "track/sort.hpp"
+
+#include <fmt/core.h>
+#include <fmt/ranges.h>
+#include <unordered_map>
 
 template <class T> struct DetectionRect {
   int frame;
@@ -76,18 +81,34 @@ void TestSORT(string seqName, bool display) {
   // 3. run SORT tracking on each frame
   track::SORT<float> sort_algo(1, 1, 0.3);
   std::vector<uint64_t> removed_ids;
+  std::unordered_map<uint64_t, int> trk_ids;
   for (int fi = 0; fi < det_frames.size(); fi++) {
-    std::cout << "Frame: " << fi << std::endl;
+    std::cout << "=========\n";
     auto res = sort_algo.predict_with_removed(det_frames[fi], removed_ids);
-    std::cout << "Removed ids: ";
-    for (const auto &id : removed_ids) {
-      std::cout << id << ' ';
-    }
-    std::cout << '\n';
+
+    fmt::print("track: ");
     for (auto tb : res)
-      std::cout << "x"
-                << "," << tb.id << "," << tb.box.x << "," << tb.box.y << ","
-                << tb.box.width << "," << tb.box.height << ",1,-1,-1,-1"
-                << std::endl;
+      fmt::print("{} ", tb.id);
+    fmt::println("");
+    fmt::println("Removed ids: {}", removed_ids);
+
+    for (const auto &tb : res) {
+      if (trk_ids.count(tb.id) == 0) {
+        trk_ids[tb.id] = fi;
+      }
+    }
+    for (const auto &id : removed_ids) {
+      if (auto it = trk_ids.find(id); it != trk_ids.end()) {
+        fmt::println("Removed {} with {}", id, it->second);
+        trk_ids.erase(it);
+      }
+    }
+    fmt::println("trk_ids size: {}, res size: {}", trk_ids.size(), res.size());
+    fmt::println("trk_ids: {}", trk_ids);
+    // for (auto tb : res)
+    //   std::cout << "x"
+    //             << "," << tb.id << "," << tb.box.x << "," << tb.box.y << ","
+    //             << tb.box.width << "," << tb.box.height << ",1,-1,-1,-1"
+    //             << std::endl;
   }
 }

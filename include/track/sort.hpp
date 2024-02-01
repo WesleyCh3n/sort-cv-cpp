@@ -64,7 +64,7 @@ public:
 
   std::vector<TrackingBox<T>>
   predict(const std::vector<cv::Rect_<T>> &detections) {
-    // prevent overflow
+    // prevent track id overflow
     if (track_id == UINT64_MAX - 1) {
       track_id = 0;
     }
@@ -74,7 +74,10 @@ public:
     // empty removed id
     removed_ids_.clear();
 
-    if (kfs_.size() == 0) { // the first frame met
+    // if no tracking object is alive, or first frame met,
+    if (kfs_.size() == 0) {
+      // reset track_id
+      track_id = 0;
       // initialize kalman trackers using first detections.
       for (unsigned int i = 0; i < detections.size(); i++) {
         KalmanTracker trk = KalmanTracker(detections[i], track_id++);
